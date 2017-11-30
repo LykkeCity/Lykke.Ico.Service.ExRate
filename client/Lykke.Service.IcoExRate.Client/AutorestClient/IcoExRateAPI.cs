@@ -113,7 +113,7 @@ namespace Lykke.Service.IcoExRate.Client.AutorestClient
         /// </summary>
         private void Initialize()
         {
-            BaseUri = new System.Uri("");
+            BaseUri = new System.Uri("http://localhost/");
             SerializationSettings = new JsonSerializerSettings
             {
                 Formatting = Newtonsoft.Json.Formatting.Indented,
