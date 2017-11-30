@@ -81,7 +81,10 @@ namespace Lykke.Service.IcoExRate
                 app.UseLykkeMiddleware("IcoExRate", ex => new {Message = "Technical problem"});
 
                 app.UseMvc();
-                app.UseSwagger();
+                app.UseSwagger(c =>
+                {
+                    c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+                });
                 app.UseSwaggerUI(x =>
                 {
                     x.RoutePrefix = "swagger/ui";
