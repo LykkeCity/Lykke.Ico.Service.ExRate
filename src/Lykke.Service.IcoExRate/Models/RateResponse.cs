@@ -12,6 +12,7 @@ namespace Lykke.Service.IcoExRate.Models
 
     public class AverageRateResponse
     {
+        public string Pair { get; set; }
         public decimal? AverageRate { get; set; }
         public RateResponse[] Rates { get; set; }
     }

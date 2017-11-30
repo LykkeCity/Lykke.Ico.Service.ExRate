@@ -11,23 +11,24 @@ namespace Lykke.Service.IcoExRate.Client.AutorestClient.Models
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class ErrorResponse
+    public partial class AverageRateResponse
     {
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the AverageRateResponse class.
         /// </summary>
-        public ErrorResponse()
+        public AverageRateResponse()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the AverageRateResponse class.
         /// </summary>
-        public ErrorResponse(string errorMessage = default(string), IDictionary<string, IList<string>> modelErrors = default(IDictionary<string, IList<string>>))
+        public AverageRateResponse(string pair = default(string), double? averageRate = default(double?), IList<RateResponse> rates = default(IList<RateResponse>))
         {
-            ErrorMessage = errorMessage;
-            ModelErrors = modelErrors;
+            Pair = pair;
+            AverageRate = averageRate;
+            Rates = rates;
             CustomInit();
         }
 
@@ -38,13 +39,18 @@ namespace Lykke.Service.IcoExRate.Client.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ErrorMessage")]
-        public string ErrorMessage { get; private set; }
+        [JsonProperty(PropertyName = "Pair")]
+        public string Pair { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ModelErrors")]
-        public IDictionary<string, IList<string>> ModelErrors { get; private set; }
+        [JsonProperty(PropertyName = "AverageRate")]
+        public double? AverageRate { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "Rates")]
+        public IList<RateResponse> Rates { get; set; }
 
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using Lykke.Service.IcoExRate.Core.Services;
 using Lykke.Service.IcoExRate.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -21,97 +20,52 @@ namespace Lykke.Service.IcoExRate.Controllers
         }
 
         [HttpGet("{market}/{pair}/{dateTimeUtc}")]
-        [ProducesResponseType(typeof(decimal?), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetRate([Required] Market market, [Required] Pair pair, [Required] DateTime dateTimeUtc)
+        public async Task<RateResponse> GetRate([Required] Market market, [Required] Pair pair, [Required] DateTime dateTimeUtc)
         {
-            var result = await _exRateService.GetRate(pair, market, dateTimeUtc);
-
-            return Ok(result?.ExchangeRate);
+            return await GetRateResponse(pair, Market.Lykke, dateTimeUtc);
         }
 
         [HttpGet("{pair}/{dateTimeUtc}")]
-        [ProducesResponseType(typeof(RateResponse[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAllRatesByPairAndDateTime([Required] Pair pair, [Required] DateTime dateTimeUtc)
+        public async Task<RateResponse[]> GetAllRatesByPairAndDateTime([Required] Pair pair, [Required] DateTime dateTimeUtc)
         {
-            var rates = new RateResponse[]
+            return new RateResponse[]
             {
                 await GetRateResponse(pair, Market.Lykke, dateTimeUtc),
                 await GetRateResponse(pair, Market.Kraken, dateTimeUtc),
                 await GetRateResponse(pair, Market.Bitfinex, dateTimeUtc)
             };
-
-            return Ok(rates);
         }
 
         [HttpGet("{pair}/{dateTimeUtc}/average")]
-        [ProducesResponseType(typeof(AverageRateResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAverageRateByPairAndDateTime([Required] Pair pair, [Required] DateTime dateTimeUtc)
+        public async Task<AverageRateResponse> GetAverageRateByPairAndDateTime([Required] Pair pair, [Required] DateTime dateTimeUtc)
         {
-            return Ok(await GetAverageResponse(pair, dateTimeUtc));
+            return await GetAverageResponse(pair, dateTimeUtc);
         }
 
-        [HttpGet("{pair}/latest")]
-        [ProducesResponseType(typeof(RateResponse[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAllLatestRatesByPair([Required] Pair pair)
+        [HttpGet("{dateTimeUtc}")]
+        public async Task<RateResponse[]> GetAllRatesByDateTime([Required] DateTime dateTimeUtc)
         {
             var now = DateTime.UtcNow;
 
-            var rates = new RateResponse[]
+            return new RateResponse[]
             {
-                await GetRateResponse(pair, Market.Lykke, now),
-                await GetRateResponse(pair, Market.Kraken, now),
-                await GetRateResponse(pair, Market.Bitfinex, now)
+                await GetRateResponse(Pair.BTCUSD, Market.Lykke, dateTimeUtc),
+                await GetRateResponse(Pair.ETHUSD, Market.Lykke, dateTimeUtc),
+                await GetRateResponse(Pair.BTCUSD, Market.Kraken, dateTimeUtc),
+                await GetRateResponse(Pair.ETHUSD, Market.Kraken, dateTimeUtc),
+                await GetRateResponse(Pair.BTCUSD, Market.Bitfinex, dateTimeUtc),
+                await GetRateResponse(Pair.ETHUSD, Market.Bitfinex, dateTimeUtc)
             };
-
-            return Ok(rates);
         }
 
-        [HttpGet("{pair}/latest/average")]
-        [ProducesResponseType(typeof(AverageRateResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetLatestAverageRateByPairAndDateTime([Required] Pair pair)
+        [HttpGet("{dateTimeUtc}/average")]
+        public async Task<AverageRateResponse[]> GetAllAverageRatesByDateTime([Required] DateTime dateTimeUtc)
         {
-            return Ok(await GetAverageResponse(pair, DateTime.UtcNow));
-        }
-
-        [HttpGet("latest")]
-        [ProducesResponseType(typeof(RateResponse[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAllLatestRates()
-        {
-            var now = DateTime.UtcNow;
-
-            var rates = new RateResponse[]
+            return new AverageRateResponse[]
             {
-                await GetRateResponse(Pair.BTCUSD, Market.Lykke, now),
-                await GetRateResponse(Pair.BTCUSD, Market.Kraken, now),
-                await GetRateResponse(Pair.BTCUSD, Market.Bitfinex, now),
-                await GetRateResponse(Pair.ETHUSD, Market.Lykke, now),
-                await GetRateResponse(Pair.ETHUSD, Market.Kraken, now),
-                await GetRateResponse(Pair.ETHUSD, Market.Bitfinex, now)
+                await GetAverageResponse(Pair.BTCUSD, dateTimeUtc),
+                await GetAverageResponse(Pair.ETHUSD, dateTimeUtc)
             };
-
-            return Ok(rates);
-        }
-
-        [HttpGet("latest/average")]
-        [ProducesResponseType(typeof(AverageRateResponse[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetLatestAverageRateByPairAndDateTime()
-        {
-            var now = DateTime.UtcNow;
-
-            var averages = new AverageRateResponse[]
-            {
-                await GetAverageResponse(Pair.BTCUSD, now),
-                await GetAverageResponse(Pair.ETHUSD, now)
-            };
-
-            return Ok(averages);
         }
 
         private async Task<AverageRateResponse> GetAverageResponse(Pair pair, DateTime dateTimeUtc)
@@ -154,6 +108,7 @@ namespace Lykke.Service.IcoExRate.Controllers
 
             return new AverageRateResponse
             {
+                Pair = Enum.GetName(typeof(Pair), pair),
                 AverageRate = validRates.Average(f => f.Rate),
                 Rates = rates
             };
