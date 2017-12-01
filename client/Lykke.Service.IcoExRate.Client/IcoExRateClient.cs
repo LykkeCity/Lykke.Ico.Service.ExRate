@@ -4,6 +4,8 @@ using Common.Log;
 using Lykke.Service.IcoExRate.Client.AutorestClient;
 using Lykke.Service.IcoExRate.Client.AutorestClient.Models;
 using System.Collections.Generic;
+using Microsoft.Rest;
+using System.Net;
 
 namespace Lykke.Service.IcoExRate.Client
 {
@@ -29,7 +31,19 @@ namespace Lykke.Service.IcoExRate.Client
 
         public async Task<AverageRateResponse> GetAverageRate(Pair pair, DateTime dateTimeUtc)
         {
-            return await _service.ApiRatesByPairByDateTimeUtcAverageGetAsync(pair, dateTimeUtc);
+            try
+            {
+                return await _service.ApiRatesByPairByDateTimeUtcAverageGetAsync(pair, dateTimeUtc);
+            }
+            catch (HttpOperationException e)
+            {
+                if (e.Response.StatusCode == HttpStatusCode.NoContent)
+                {
+                    return null;
+                }
+
+                throw;
+            }
         }
 
         public async Task<IList<AverageRateResponse>> GetAverageRates(DateTime dateTimeUtc)
