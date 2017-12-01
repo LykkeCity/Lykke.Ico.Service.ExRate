@@ -45,15 +45,13 @@ namespace Lykke.Service.IcoExRate.Controllers
         [HttpGet("{dateTimeUtc}")]
         public async Task<RateResponse[]> GetAllRatesByDateTime([Required] DateTime dateTimeUtc)
         {
-            var now = DateTime.UtcNow;
-
             return new RateResponse[]
             {
                 await GetRateResponse(Pair.BTCUSD, Market.Lykke, dateTimeUtc),
-                await GetRateResponse(Pair.ETHUSD, Market.Lykke, dateTimeUtc),
                 await GetRateResponse(Pair.BTCUSD, Market.Kraken, dateTimeUtc),
-                await GetRateResponse(Pair.ETHUSD, Market.Kraken, dateTimeUtc),
                 await GetRateResponse(Pair.BTCUSD, Market.Bitfinex, dateTimeUtc),
+                await GetRateResponse(Pair.ETHUSD, Market.Lykke, dateTimeUtc),
+                await GetRateResponse(Pair.ETHUSD, Market.Kraken, dateTimeUtc),
                 await GetRateResponse(Pair.ETHUSD, Market.Bitfinex, dateTimeUtc)
             };
         }

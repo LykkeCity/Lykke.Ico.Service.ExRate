@@ -5,7 +5,6 @@ using AzureStorage.Tables;
 using Lykke.SettingsReader;
 using Common.Log;
 using System.Linq;
-using System.Collections.Generic;
 using Lykke.Service.IcoExRate.Core.Domain;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -19,7 +18,7 @@ namespace Lykke.Service.IcoExRate.AzureRepositories.Rate
         private readonly INoSQLTableStorage<RateEntity> _tableKrakenEthUsd;
         private readonly INoSQLTableStorage<RateEntity> _tableBitfinexBtcUsd;
         private readonly INoSQLTableStorage<RateEntity> _tableBitfinexEthUsd;
-        private static string GetPartitionKey() => DateTime.UtcNow.ToString("yyyy-MM-dd");
+        private static string GetPartitionKey(DateTime created) => created.ToUniversalTime().ToString("yyyy-MM-dd");
         private static string GetRowKey(DateTime created) => (DateTime.MaxValue.Ticks - created.ToUniversalTime().Ticks).ToString().PadLeft(19, '0');
 
         public RateRepository(IReloadingManager<string> connectionStringManager, ILog log)
@@ -35,9 +34,16 @@ namespace Lykke.Service.IcoExRate.AzureRepositories.Rate
         public async Task<IRate> GetRateAsync(Pair pair, Market market, DateTime created)
         {
             var table = GetTable(pair, market);
+
+            var filterString = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, GetPartitionKey(created)),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, GetRowKey(created))
+            );
+
             var query = new TableQuery<RateEntity>()
             {
-                FilterString = TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual, GetRowKey(created)),
+                FilterString = filterString,
                 TakeCount = 1
             };
 
@@ -50,10 +56,11 @@ namespace Lykke.Service.IcoExRate.AzureRepositories.Rate
         public async Task SaveAsync(Pair pair, Market market, decimal? rate)
         {
             var table = GetTable(pair, market);
+            var now = DateTime.UtcNow;
             var entity = new RateEntity
             {
-                PartitionKey = GetPartitionKey(),
-                RowKey = GetRowKey(DateTime.UtcNow),
+                PartitionKey = GetPartitionKey(now),
+                RowKey = GetRowKey(now),
                 ExchangeRate = rate
             };
 
