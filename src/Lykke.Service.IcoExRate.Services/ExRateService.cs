@@ -173,7 +173,12 @@ namespace Lykke.Service.IcoExRate.Services
                 {
                     if (ex.Status == WebExceptionStatus.Timeout)
                     {
-                        await _log.WriteInfoAsync(nameof(ExRateService), nameof(GetResponse), @"Timeout for url: {url}");
+                        await _log.WriteInfoAsync(nameof(ExRateService), nameof(GetResponse), $"Timeout for url: {url}");
+                        return null;
+                    }
+                    if (ex.Message.Contains("(520) Origin Error"))
+                    {
+                        await _log.WriteInfoAsync(nameof(ExRateService), nameof(GetResponse), $"(520) Origin Error for url: {url}");
                         return null;
                     }
 
