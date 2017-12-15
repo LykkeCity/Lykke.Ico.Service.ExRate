@@ -39,14 +39,18 @@ namespace Lykke.Service.IcoExRate.Services
             }
             if (response == string.Empty)
             {
-                await _log.WriteInfoAsync(nameof(ExRateService), nameof(SaveRate), $"Empty response for url: {url}");
+                await _log.WriteInfoAsync(nameof(SaveRate), 
+                    $"Url: {url}",
+                    $"Empty response");
                 return;
             }
 
             var rate = GetRate(pair, market, response);
             if (rate == 0)
             {
-                await _log.WriteInfoAsync(nameof(ExRateService), nameof(SaveRate), $"0 rate is recieved: url: {url} and response: {response}");
+                await _log.WriteInfoAsync(nameof(SaveRate),
+                    $"Url: {url}, Response: {response}",
+                    $"0 rate is recieved");
                 return;
             }
 
@@ -173,12 +177,16 @@ namespace Lykke.Service.IcoExRate.Services
                 {
                     if (ex.Status == WebExceptionStatus.Timeout)
                     {
-                        await _log.WriteInfoAsync(nameof(ExRateService), nameof(GetResponse), $"Timeout for url: {url}");
+                        await _log.WriteInfoAsync(nameof(GetResponse),
+                            $"Url: {url}",
+                            $"Timeout");
                         return null;
                     }
                     if (ex.Message.Contains("(520) Origin Error"))
                     {
-                        await _log.WriteInfoAsync(nameof(ExRateService), nameof(GetResponse), $"(520) Origin Error for url: {url}");
+                        await _log.WriteInfoAsync(nameof(GetResponse),
+                            $"Url: {url}",
+                            $"(520) Origin Error");
                         return null;
                     }
 

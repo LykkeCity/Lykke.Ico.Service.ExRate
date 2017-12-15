@@ -30,7 +30,7 @@ namespace Lykke.Service.IcoExRate.PeriodicalHandlers
                 await _log.WriteErrorAsync(
                     nameof(BitfinexBtcUsdPeriodicalHandler),
                     nameof(Execute),
-                    "Failed to save rates for Bitfinex/BTCUSD",
+                    "Exchange: Bitfinex, AssetPair: BTCUSD",
                     ex);
             }
 
