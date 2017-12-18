@@ -198,6 +198,8 @@ namespace Lykke.Service.IcoExRate
                 aggregateLogger.AddLog(azureStorageLogger);
             }
 
+            aggregateLogger.AddIcoSlackLog(slackService);
+
             return aggregateLogger;
         }
     }
