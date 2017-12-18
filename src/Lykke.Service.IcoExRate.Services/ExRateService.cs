@@ -79,8 +79,8 @@ namespace Lykke.Service.IcoExRate.Services
                 return result;
             }
 
-            throw new Exception($"Failed to get rate. Pair: {Enum.GetName(typeof(Pair), pair)}, " +
-                $"Market: {Enum.GetName(typeof(Market), market)}, Response: {response}");
+            throw new Exception($"Failed to get rate. pair: {Enum.GetName(typeof(Pair), pair)}, " +
+                $"market: {Enum.GetName(typeof(Market), market)}, rateStr: {rateStr}, response: {response}");
         }
 
         private string GeRateBitfinex(Pair pair, string response)
@@ -190,7 +190,7 @@ namespace Lykke.Service.IcoExRate.Services
                         return null;
                     }
 
-                    throw;
+                    throw new Exception($"Status Code: {ex.Status}", ex);
                 }
             }
         }
