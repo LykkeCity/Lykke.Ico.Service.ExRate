@@ -35,6 +35,16 @@ namespace Lykke.Service.IcoExRate.Services
             var response = await GetResponse(url);
             if (response == null)
             {
+                var latestRate = await GetRate(pair, market, DateTime.UtcNow);
+                if (latestRate != null)
+                {
+                    var diff = DateTime.UtcNow - latestRate.CreatedUtc;
+                    if (diff.TotalMinutes > 10)
+                    {
+                        throw new Exception($"Failed to get rate for more than {diff.TotalMinutes} mins");
+                    }
+                }
+
                 return;
             }
             if (response == string.Empty)
