@@ -175,22 +175,11 @@ namespace Lykke.Service.IcoExRate.Services
                 }
                 catch (WebException ex)
                 {
-                    if (ex.Status == WebExceptionStatus.Timeout)
-                    {
-                        await _log.WriteInfoAsync(nameof(GetResponse),
-                            $"Url: {url}",
-                            $"Timeout");
-                        return null;
-                    }
-                    if (ex.Message.Contains("(520) Origin Error"))
-                    {
-                        await _log.WriteInfoAsync(nameof(GetResponse),
-                            $"Url: {url}",
-                            $"(520) Origin Error");
-                        return null;
-                    }
+                    await _log.WriteInfoAsync(nameof(GetResponse),
+                            $"erl: {url}",
+                            $"Error. Status Code: {ex.Status}. Stack: {ex.ToString()}");
 
-                    throw new Exception($"Status Code: {ex.Status}", ex);
+                    return null;
                 }
             }
         }
