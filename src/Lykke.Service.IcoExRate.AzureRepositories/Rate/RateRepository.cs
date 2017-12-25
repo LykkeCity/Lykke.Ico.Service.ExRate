@@ -64,7 +64,7 @@ namespace Lykke.Service.IcoExRate.AzureRepositories.Rate
                 ExchangeRate = rate
             };
 
-            await table.InsertOrMergeAsync(entity);
+            await table.InsertOrReplaceAsync(entity);
         }
 
         private INoSQLTableStorage<RateEntity> GetTable(Pair pair, Market market)
