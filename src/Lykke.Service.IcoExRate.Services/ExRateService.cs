@@ -54,6 +54,13 @@ namespace Lykke.Service.IcoExRate.Services
                     $"Empty response");
                 return;
             }
+            if (response.ToLower().Contains("eservice:unavailable"))
+            {
+                await _log.WriteInfoAsync(nameof(SaveRate),
+                    $"Url: {url}",
+                    $"Service Unavailable: {response}");
+                return;
+            }
 
             var rate = GetRate(pair, market, response);
             if (rate == 0)
